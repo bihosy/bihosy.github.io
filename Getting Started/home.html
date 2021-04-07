@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        body,
+        * {
+
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-repeat: no-repeat;
+            background-size: 100%;
+        }
+
+        #content {
+            display: inline;
+            width: 600px;
+            text-align: center;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #weather {
+            color: white;
+            display: grid;
+            width: 0px;
+        }
+
+        #Time {
+            width: 445px;
+            color: white;
+            font-size: 100px;
+
+        }
+
+        #welcome {
+            display: block;
+            width: 600px;
+            color: white;
+            font-size: 50px;
+        }
+
+        #wyn,
+        #wtd {
+            text-align: center;
+            border: none;
+            margin-top: 30px;
+            background: transparent;
+
+        }
+        
+        
+        #wyn::placeholder,
+        #wtd::placeholder {
+	        color: white;
+        }
+
+        #wyn {
+            width: 445px;
+            color: white;
+            font-size: 50px;
+            border-bottom: 3px solid white;
+        }
+
+        #wtd {
+            width: 220px;
+            color: white;
+            font-size: 32px;
+            background-color: rgba(0, 0, 0, 0.5);
+
+        }
+
+        .del {
+            float: right;
+            color: white;
+            margin-top: 2px;
+            margin-right: 10px;
+            font-size: 32px;
+            background: none;
+            border: none;
+        }
+
+        .ok {
+            position: relative;
+            color: white;
+            left: -6px;
+            top: 8px;
+            font-size: 32px;
+            background: none;
+            border: none;
+        }
+
+        .todoli {
+            margin-top: 5px;
+            text-align: left;
+            color: white;
+            font-size: 30px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .xbtn {
+            background-color: rgba(255, 255, 255, 0);
+        }
+
+
+        .wimg {
+            grid-column: 1;
+            grid-row: 1;
+
+        }
+
+        .temp {
+            grid-column: 2;
+            grid-row: 1;
+            font-size: 40px;
+
+        }
+
+        .city {
+            grid-row: 2;
+            grid-column: 2;
+        }
+
+        .reset {
+            margin-top: -75px;
+            float: right;
+        }
+
+        ul {
+            overflow-y: auto;
+            list-style: none;
+            position: absolute;
+            width: 350px;
+            height: 200px;
+            left: 50%;
+            top: 50%;
+            margin-top: 200px;
+            transform: translate(-50%);
+
+
+        }
+    </style>
+</head>
+
+
+
+
+
+
+
+
+
+<body onload="Time()">
+
+
+    <div id="weather">
+        <img class="wimg">
+        <span class="temp"></span>
+        <span class="city"></span>
+    </div>
+
+    <div id="content">
+        <span id="Time"></span>
+        <span id="welcome"></span>
+
+
+        <input type="text" id="wyn" placeholder="What is your name?" onkeydown="JavaScript:Enter_Check();">
+
+
+        <input type="text" id="wtd" placeholder="Write a to do?">
+
+
+        <button type="button" class="ok" onclick="todo()"><img src="img/ok.png"></button>
+
+
+
+    </div>
+
+    <ul id="todolist"></ul>
+    <input type="button" value="Reset" onclick="deltest()" class="reset">
+</body>
+
+
+
+
+
+
+
+<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+<script>
+    var apiURI = "https://api.openweathermap.org/data/2.5/weather?q=Busan&appid=2ad6065f40249991f1e35e9bea9248d4";
+    var welcome = document.getElementById("welcome");
+    var list = document.getElementById("todolist");
+    var bglist = ['img/1.jpg', 'img/2.jpg', 'img/3.jpg', 'img/4.jpg', 'img/5.jpg']
+    var cnt = 0;
+
+    //날씨api 사용
+    $.ajax({
+
+        url: apiURI,
+        dataType: "json",
+        type: "GET",
+        async: "false",
+        success: function(resp) {
+            var imgURL = "http://openweathermap.org/img/w/" + resp.weather[0].icon + ".png";
+            $('.temp').text((resp.main.temp - 273.15) + "˚C");
+            $('.city').text(resp.name);
+            $(".wimg").attr("src", imgURL);
+
+        }
+    })
+
+
+    //첫실행
+    window.onload = function() {
+
+
+
+        var jbRandom = Math.random();
+        if (localStorage.bg == null) {
+            var bgnum = Math.floor(jbRandom * 5);
+            document.body.style.backgroundImage = 'url("' + bglist[bgnum] + '")';
+
+
+
+            var setnum = bglist[bgnum].substr(4, 1);
+            console.log(bglist);
+        } else {
+            var usebg = localStorage.getItem("bg");
+            bglist.splice(usebg, 1);
+            var bgnum = Math.floor(jbRandom * 4);
+            document.body.style.backgroundImage = 'url("' + bglist[bgnum] + '")';
+            var setnum = bglist[bgnum].substr(4, 1);
+            console.log(bglist);
+        }
+        localStorage.bg = setnum - 1;
+
+        //첫 시간 세팅
+        var now = new Date();
+        hours = now.getHours();
+        minutes = now.getMinutes();
+        seconds = now.getSeconds();
+        if (hours < 10) {
+            hours = "0" + hours;
+        }
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        if (seconds < 10) {
+            seconds = "0" + seconds;
+        }
+        document.getElementById("Time").innerHTML = hours + ":" + minutes + ":" + seconds;
+        setInterval("Time()", 1000);
+
+
+        //시간대별 인사
+        if (localStorage.Name == null) {} else {
+            document.getElementById("wyn").style.display = "none";
+            if (hours >= 18) {
+                welcome.innerHTML = "Good Evening, " + localStorage.Name;
+            } else if (hours >= 12) {
+                welcome.innerHTML = "Good Afternoon,  " + localStorage.Name;
+            } else {
+                welcome.innerHTML = "Good Morninig, " + localStorage.Name;
+            }
+
+        }
+
+        var output = localStorage.getItem("todo");
+        var arr = JSON.parse(output);
+        for (var i = 0; i < arr.length; i++) {
+            var temp = document.createElement('li');
+            temp.setAttribute("class", "todoli");
+            temp.setAttribute("id", "li" + i);
+            temp.innerHTML = arr[i];
+            temp.innerHTML += "<button onclick='remove(" + i + ")'class='del'> X </button>";
+            list.appendChild(temp);
+            cnt = i;
+        }
+
+    }
+
+
+    //실시간
+    function Time() {
+        var now = new Date();
+        hours = now.getHours();
+        minutes = now.getMinutes();
+        seconds = now.getSeconds();
+        if (hours < 10) {
+            hours = "0" + hours;
+        }
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        if (seconds < 10) {
+            seconds = "0" + seconds;
+        }
+        document.getElementById("Time").innerHTML = hours + ":" + minutes + ":" + seconds;
+    }
+
+
+
+
+    //엔터입력
+    function Enter_Check() {
+        var name = document.getElementById('wyn').value;
+        if (event.keyCode == 13) {
+            if (name == "") {
+                alert("ss");
+            } else {
+                localStorage.Name = name;
+                document.getElementById("wyn").style.display = "none";
+                if (hours >= 18) {
+                    welcome.innerHTML = "Good 이브닝 " + localStorage.Name;
+                } else if (hours >= 12) {
+                    welcome.innerHTML = "Good Afternoon  " + localStorage.Name;
+                } else {
+                    welcome.innerHTML = "Good Mornning " + localStorage.Name;
+                }
+
+            }
+        }
+    }
+
+
+    //할일 추가
+    function todo() {
+        if (localStorage.todo != null) {
+            var output = localStorage.getItem("todo");
+            var arr = JSON.parse(output);
+        } else {
+            var arr = new Array();
+        }
+
+
+        var todocon = document.getElementById('wtd').value;
+
+        if (todocon != "") {
+
+            var temp = document.createElement('li');
+            temp.setAttribute("id", "li" + cnt);
+            temp.setAttribute("class", "todoli");
+            temp.innerHTML = todocon;
+            temp.innerHTML += "<button onclick='remove(" + cnt + ")'class='del'> X </button>";
+            list.appendChild(temp);
+            arr.push(todocon);
+            localStorage.setItem("todo", JSON.stringify(arr));
+
+            cnt++;
+
+            document.getElementById("wtd").value = null;
+        }
+    }
+
+
+
+
+    //할일 삭제
+    function remove(cnt) {
+        var output = localStorage.getItem("todo");
+        var arr = JSON.parse(output);
+        var li = document.getElementById('li' + cnt);
+        list.removeChild(li);
+        arr.splice(cnt, 1);
+        localStorage.setItem("todo", JSON.stringify(arr));
+
+        while (list.hasChildNodes()) {
+            list.removeChild(list.firstChild);
+        }
+
+        output = localStorage.getItem("todo");
+        arr = JSON.parse(output);
+        for (var i = 0; i < arr.length; i++) {
+            var temp = document.createElement('li');
+            temp.setAttribute("class", "todoli");
+            temp.setAttribute("id", "li" + i);
+            temp.innerHTML = arr[i];
+            temp.innerHTML += "<button onclick='remove(" + i + ")'class='del'>X</button>";
+            list.appendChild(temp);
+            cnt = i;
+        }
+
+    }
+
+
+    //테스트용 초기화
+    function deltest() {
+        document.getElementById("wyn").style.display = "inline-block";
+        document.getElementById("welcome").innerHTML = "";
+        document.getElementById("wyn").value = null;
+        localStorage.removeItem("Name");
+        localStorage.removeItem("todo");
+        while (list.hasChildNodes()) {
+            list.removeChild(list.firstChild);
+        }
+
+    }
+</script></html>
