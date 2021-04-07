@@ -6,7 +6,7 @@
     <title>Document</title>
     
 
-    <script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script  src="https://code.jquery.com/jquery-latest.min.js"></script>
 
 
    
@@ -217,7 +217,7 @@
         type: "GET",
         async: "false",
         success: function(resp) {
-            var imgURL = "http://openweathermap.org/img/w/" + resp.weather[0].icon + ".png";
+            var imgURL = "https://openweathermap.org/img/w/" + resp.weather[0].icon + ".png";
             $('.temp').text((resp.main.temp - 273.15) + "˚C");
             $('.city').text(resp.name);
             $(".wimg").attr("src", imgURL);
