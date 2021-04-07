@@ -81,6 +81,18 @@
 
         }
 
+        #search {
+            border: 5px solid;
+            background: none;
+            border-Color:red blue green orange;
+            height: 20px;
+            transition: 0.5s;
+        }
+        
+        #searchbtn{
+            height: 50
+        }
+
         .del {
             float: right;
             color: white;
@@ -186,7 +198,6 @@
             }
 
         }
-
     </style>
 </head>
 
@@ -206,6 +217,13 @@
         <span class="temp"></span>
         <span class="city"></span>
     </div>
+    <select name="engine" id="engine" onchange="bordercha()">
+        <option value="Google" selected>Google</option>
+        <option value="Naver">Naver</option>
+    </select>
+    <input type="text" id="search">
+
+    <input type="button" id="searchbtn" value="검색" onclick="search()">
 
     <div id="content">
         <span id="Time"></span>
@@ -242,6 +260,8 @@
     var list = document.getElementById("todolist");
     var bglist = ['./img/1.jpg', './img/2.jpg', './img/3.jpg', './img/4.jpg', './img/5.jpg']
     var cnt = 0;
+    var searchtxt = document.getElementById("search").value;
+    searchtxt = null;
 
     //날씨api 사용
     $.ajax({
@@ -263,7 +283,7 @@
     //첫실행
     window.onload = function() {
 
-
+        var setnum=9;
 
         var jbRandom = Math.random();
         if (localStorage.bg == null) {
@@ -272,14 +292,14 @@
 
 
 
-            var setnum = bglist[bgnum].substr(4, 1);
+            var setnum = bglist[bgnum].substr(6, 1);
             console.log(bglist);
         } else {
             var usebg = localStorage.getItem("bg");
             bglist.splice(usebg, 1);
             var bgnum = Math.floor(jbRandom * 4);
             document.body.style.backgroundImage = 'url("' + bglist[bgnum] + '")';
-            var setnum = bglist[bgnum].substr(4, 1);
+            var setnum = bglist[bgnum].substr(6, 1);
             console.log(bglist);
         }
         localStorage.bg = setnum - 1;
@@ -356,7 +376,7 @@
         var name = document.getElementById('wyn').value;
         if (event.keyCode == 13) {
             if (name == "") {
-                alert("ss");
+                alert("이름이 입력되지 않았습니다.");
             } else {
                 localStorage.Name = name;
                 document.getElementById("wyn").style.display = "none";
@@ -399,6 +419,8 @@
             cnt++;
 
             document.getElementById("wtd").value = null;
+        } else {
+            alert("아무것도 입력되지 않았습니다.");
         }
     }
 
@@ -432,6 +454,34 @@
 
     }
 
+    
+
+
+    function search() {
+        searchtxt = document.getElementById("search").value;
+        var select = document.getElementById("engine");
+        var engine = select.options[select.selectedIndex].value;
+        if (engine == "Google") {
+            location.href = 'https://www.google.co.kr/search?q=' + searchtxt;
+        } else if (engine == "Naver") {
+            location.href = 'https://search.naver.com/search.naver?query=' + searchtxt;
+        }
+
+    }
+
+    function bordercha() {
+        var select = document.getElementById("engine");
+        var engine = select.options[select.selectedIndex].value;
+
+        if (engine == "Google") { document.getElementById("search").style.borderColor="red blue green orange";
+        } else if (engine == "Naver") {
+            document.getElementById("search").style.borderColor="rgb(3,199,90)";
+        }
+
+    }
+
+
+
 
     //테스트용 초기화
     function deltest() {
@@ -445,7 +495,4 @@
         }
 
     }
-
-</script>
-
-</html>
+</script></html>
