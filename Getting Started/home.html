@@ -4,12 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    
 
-    <script  src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-   
     <style>
         body,
         * {
@@ -20,7 +18,7 @@
 
         body {
             background-repeat: no-repeat;
-            background-size: 100%;
+            background-size: 100% 1080px;
         }
 
         #content {
@@ -61,11 +59,11 @@
             background: transparent;
 
         }
-        
-        
+
+
         #wyn::placeholder,
         #wtd::placeholder {
-	        color: white;
+            color: white;
         }
 
         #wyn {
@@ -150,7 +148,24 @@
             top: 50%;
             margin-top: 200px;
             transform: translate(-50%);
+        }
 
+
+
+
+        @media (max-width: 768px) {
+
+
+
+            #content {
+                width: 100%;
+            }
+
+            #welcome {
+                width: 100%;
+                color: white;
+                font-size: 30px;
+            }
 
         }
     </style>
@@ -200,7 +215,7 @@
 
 
 
-
+<script src="https://code.jquery.com/jquery-latest.min.js"></script>
 
 <script>
     var apiURI = "https://api.openweathermap.org/data/2.5/weather?q=Busan&appid=2ad6065f40249991f1e35e9bea9248d4";
