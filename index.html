@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body,
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        #main{
+            height: 100vh;
+            background-repeat: no-repeat;
+            background-size: 100% 1080px;
+        }
+
+        #weather {
+            color: white;
+            display: grid;
+            width: 0px;
+        }
+        
+        #info{
+            width: 600px;
+            text-align: center;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #time{
+            font-size: 50px;
+            color: white;
+        }
+        
+        .nameUpdate::placeholder,
+        .todocon::placeholder {
+            color: white;
+        }
+        
+        .nameUpdate{
+            width: 400px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid white;
+            font-size: 40px;
+            text-align: center;
+            margin-bottom: 10px;
+            color: white;
+            
+        }
+        
+        .todocon{
+            background-color: rgba(0,0,0,0.4);
+            border: none;
+            text-align: center;
+            font-size: 30px;
+            color: white;
+            
+        }
+        
+        .welcome{
+            font-size: 50px;
+            color: white;
+        }
+        
+
+        .temp {
+            grid-column: 2;
+            grid-row: 1;
+            font-size: 40px;
+
+        }
+
+        .ok{
+            position: relative;
+           background-image: url(./img/ok.png);
+            border: none;
+            left: -6px;
+            top: 7px;
+            width: 46px;
+            height: 34px;
+        }
+        .city {
+            grid-column: 2;
+            grid-row: 2;
+        }
+        .list{
+            overflow-y: auto;
+            list-style: none;
+            color: white;
+            position: absolute;
+            left: 50%;
+            margin-top: 75px;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 150px;
+            text-align: left;
+        }
+        li{
+            margin-top: 5px;
+            font-size: 24px;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .list button{
+            background: none;
+            border: none;
+            color: white;
+            font-size: 19px;
+            margin-right: 5px;
+            float: right;
+        }
+        
+        .list::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera*/
+        }
+        
+        @media (max-width: 768px) {
+
+
+
+            #info {
+                width: 400px;
+            }
+
+
+            #weather {
+                position: absolute;
+                left: 50%;
+                top: 15%;
+                transform: translateX(-70px);
+
+            }
+            .todocon{
+                font-size: 28px;
+            }
+            .ok{
+                height: 32px;
+            }
+
+        }
+        
+        
+        
+
+
+    </style>
+</head>
+
+<body>
+    <div id="main" :style="{backgroundImage: 'url('+this.bgname+')'}" >
+
+    <div id="weather">
+        <img class="wimg">
+        <span class="temp"></span>
+        <span class="city"></span>
+    </div>
+
+    <div id="info">
+        <p id="time">{{now}}</p>
+        <div v-if="name===undefined">
+            <input v-on:keyup.enter="updatetext" placeholder="What is your name?" class="nameUpdate">
+
+        </div>
+        <div v-else class="welcome">{{welcome}}</div>
+        
+        <input type="text" placeholder="Write a to do?" v-model="todocon" v-on:keyup.enter="todo" class="todocon">
+        
+        <button v-on:click="todo" class="ok"></button>
+
+
+
+        <ul class="list">
+            <li v-for="(todolist, index) in todos">{{todolist}} <button v-on:click="deltodo(index)">X</button></li>
+        </ul>
+
+
+
+
+    </div>
+</div>
+
+
+    <script>
+        var apiURI = "https://api.openweathermap.org/data/2.5/weather?q=Busan&appid=2ad6065f40249991f1e35e9bea9248d4";
+
+        $.ajax({
+
+            url: apiURI,
+            dataType: "json",
+            type: "GET",
+            async: "false",
+            success: function(resp) {
+                var imgURL = "https://openweathermap.org/img/w/" + resp.weather[0].icon + ".png";
+                $('.temp').text((resp.main.temp - 273.15) + "˚C");
+                $('.city').text(resp.name);
+                $(".wimg").attr("src", imgURL);
+
+            }
+        })
+
+
+        var LSname = new Vue({
+
+            el: '#main',
+
+            data: {
+                name: localStorage.Name,
+                now: "00:00:00",
+                welcome: "",
+                greet: "",
+                LStodo: localStorage.todo,
+                todocon: "",
+                bgname: "",
+                bgnum: Math.floor(Math.random() * 5),
+                bg: [
+                    {bg: "./img/1.jpg"},
+                    {bg: "./img/2.jpg"},
+                    {bg: "./img/3.jpg"},
+                    {bg: "./img/4.jpg"},
+                    {bg: "./img/5.jpg"}
+                ],
+                todos: []
+
+
+
+            },
+
+            methods: {
+                updatetext(event) {
+
+                    if (event.target.value != '') {
+                        this.name = event.target.value;
+                        localStorage.setItem('Name', this.name)
+                    } else {
+                        alert("이름이 입력되지 않았습니다.");
+                    }
+
+                },
+
+                time() {
+                    var date = new Date();
+                    var hour = date.getHours();
+                    var min = date.getMinutes();
+                    var sec = date.getSeconds();
+
+                    if (hour < 10) {
+                        hour = "0" + hour
+                    }
+                    if (min < 10) {
+                        min = "0" + min
+                    }
+                    if (sec < 10) {
+                        sec = "0" + sec
+                    }
+
+                    if (hour >= 12) {
+                        this.greet = "Good Afternoon "
+                    } else if (hour >= 18) {
+                        this.greet = "Good Evening "
+                    } else {
+                        this.greet = "Good Mornning "
+                    }
+
+                    this.now = hour + ":" + min + ":" + sec
+                },
+
+
+                todo() {
+
+                    if (this.LStodo != null) {
+                        var output = localStorage.getItem("todo");
+                        var arr = JSON.parse(output);
+                    } else {
+                        var arr = new Array();
+                    }
+                    if (this.todocon != "") {
+                        arr.push(this.todocon);
+                        localStorage.setItem("todo", JSON.stringify(arr));
+                        this.LStodo = localStorage.getItem("todo");
+                        this.todolist();
+                        this.todocon = "";
+                    } else {
+                        alert("내용이 입력되지 않았습니다.")
+                    }
+                },
+
+                todolist() {
+                    if (this.LStodo != null) {
+                        var output = localStorage.getItem("todo");
+                        var arr = JSON.parse(output);
+                        for (var i = 0; i < arr.length; i++) {
+                            Vue.set(this.todos, i, arr[i]);
+                            console.log(this.todos[i]);
+                        }
+
+                    }
+                    
+
+                },
+                deltodo(index) {
+
+                    var output = localStorage.getItem("todo");
+                    var arr = JSON.parse(output);
+
+                    arr.splice(index, 1);
+                    localStorage.setItem("todo", JSON.stringify(arr));
+
+                    this.todos.splice(index, 1);
+                    this.todolist();
+                },
+                 bgchan() {
+                    this.bgname = this.bg[this.bgnum].bg;
+                    }
+
+
+
+
+            },
+
+            watch: {
+                name(newVal, oldVal) {
+                    console.log(newVal, oldVal);
+                    this.welcome = this.greet + this.name;
+                }
+            },
+
+            mounted() {
+                this.bgchan();
+                this.todolist();
+                this.time();
+                this.welcome = this.greet + this.name;
+                setInterval(this.time, 1000);
+            }
+
+        });
+
+    </script>
+</body>
+
+</html>
